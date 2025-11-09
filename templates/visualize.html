@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Visualizations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container py-4">
+    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ url_for('index') }}">← Back</a>
+    <h4>Data Visualizations</h4>
+
+    <div class="mb-4">
+      <h6>Historical Rainfall Trends</h6>
+      <img class="img-fluid border" src="data:image/png;base64,{{ trend_png }}">
+    </div>
+
+    <div class="mb-4">
+      <h6>Feature Importance (Random Forest)</h6>
+      <img class="img-fluid border" src="data:image/png;base64,{{ feat_png }}">
+    </div>
+
+    <div class="mb-4">
+      <h6>Confusion Matrix (20% holdout)</h6>
+      <img class="img-fluid border" src="data:image/png;base64,{{ cm_png }}">
+    </div>
+
+    <footer class="text-center py-3 text-muted">
+      Developed by Baarish | Dynamic Rainfall Prediction | Machine Learning Project 2025
+    </footer>
+  </body>
+</html>

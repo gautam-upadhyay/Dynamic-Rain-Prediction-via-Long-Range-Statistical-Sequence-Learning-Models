@@ -1,0 +1,34 @@
+# Weather Prediction Project Requirements
+# Core data science libraries
+pandas>=1.5.0
+numpy>=1.21.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Machine learning libraries
+scikit-learn>=1.1.0
+
+# Jupyter notebook support
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Optional: For enhanced data visualization
+plotly>=5.0.0
+
+# Optional: For additional ML algorithms
+xgboost>=1.6.0
+lightgbm>=3.3.0
+
+# Optional: For model interpretation
+shap>=0.41.0
+
+# Optional: For hyperparameter optimization
+optuna>=3.0.0
+
+
+Flask>=3.0.0
+joblib>=1.2.0
+pandas>=1.5.0
+numpy>=1.21.0
+matplotlib>=3.5.0
+scikit-learn>=1.1.0

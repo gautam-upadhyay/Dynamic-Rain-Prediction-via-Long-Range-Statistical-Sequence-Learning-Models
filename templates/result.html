@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Prediction Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container py-4">
+    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ url_for('index') }}">← Back</a>
+
+    {% if is_batch %}
+      <h4>Batch Prediction Summary ({{ model_choice }})</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          {% if summary.rf_yes is defined %}
+            <div class="alert alert-info">Random Forest: Yes={{summary.rf_yes}} | No={{summary.rf_no}}</div>
+          {% endif %}
+          {% if summary.lr_yes is defined %}
+            <div class="alert alert-success">Logistic Regression: Yes={{summary.lr_yes}} | No={{summary.lr_no}}</div>
+          {% endif %}
+        </div>
+        <div class="col-md-12">
+          <a class="btn btn-primary btn-sm" href="{{ url_for('download') }}">Download Predictions as CSV</a>
+        </div>
+        <div class="col-md-12">
+          <div class="table-responsive">
+            {{ out_preview | safe }}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <h4>Single Prediction ({{ model_choice }})</h4>
+      <div class="row g-3">
+        <div class="col-md-6">
+          {% if single_out.rf_pred %}
+            <div class="alert alert-info">Random Forest: <strong>{{ 'Yes 🌧️' if single_out.rf_pred=='Yes' else 'No ☀️' }}</strong> (p={{ '%.3f'|format(single_out.rf_prob) }})</div>
+          {% endif %}
+          {% if single_out.lr_pred %}
+            <div class="alert alert-success">Logistic Regression: <strong>{{ 'Yes 🌧️' if single_out.lr_pred=='Yes' else 'No ☀️' }}</strong> (p={{ '%.3f'|format(single_out.lr_prob) }})</div>
+          {% endif %}
+        </div>
+        <div class="col-md-6">
+          {% if prob_png %}
+            <img class="img-fluid border" src="data:image/png;base64,{{ prob_png }}">
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <hr>
+    <h6>Model Evaluation (20% holdout)</h6>
+    <table class="table table-sm">
+      <thead><tr><th>Model</th><th>Accuracy</th><th>F1</th><th>AUC</th></tr></thead>
+      <tbody>
+        <tr><td>Logistic Regression</td><td>{{ '%.3f'|format(metrics_lr.accuracy) }}</td><td>{{ '%.3f'|format(metrics_lr.f1) }}</td><td>{{ '%.3f'|format(metrics_lr.auc) }}</td></tr>
+        <tr><td>Random Forest</td><td>{{ '%.3f'|format(metrics_rf.accuracy) }}</td><td>{{ '%.3f'|format(metrics_rf.f1) }}</td><td>{{ '%.3f'|format(metrics_rf.auc) }}</td></tr>
+      </tbody>
+    </table>
+    <div class="text-muted">Better model: <strong>{{ better_model_name }}</strong></div>
+
+    <footer class="text-center py-3 text-muted">
+      Developed by Baarish | Dynamic Rainfall Prediction | Machine Learning Project 2025
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Dynamic Rainfall Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+      <a class="navbar-brand" href="{{ url_for('index') }}">Rainfall Prediction</a>
+      <div class="ms-auto">
+        <a class="btn btn-light btn-sm" href="{{ url_for('visualize') }}">Visualize</a>
+      </div>
+    </nav>
+
+    <div class="container my-4">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for cat, msg in messages %}
+            <div class="alert alert-{{cat}}">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light">
+              <strong>Manual Prediction</strong>
+            </div>
+            <div class="card-body">
+              <form method="post" action="{{ url_for('predict') }}" enctype="multipart/form-data" class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Model</label>
+                  <select class="form-select" name="model_choice">
+                    <option>Both</option>
+                    <option>Random Forest</option>
+                    <option>Logistic Regression</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Minimum temperature (°C)">MinTemp</label>
+                  <input class="form-control" name="MinTemp" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Maximum temperature (°C)">MaxTemp</label>
+                  <input class="form-control" name="MaxTemp" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Amount of rainfall (mm)">Rainfall</label>
+                  <input class="form-control" name="Rainfall" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Evaporation (mm)">Evaporation</label>
+                  <input class="form-control" name="Evaporation" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Sunshine (hours)">Sunshine</label>
+                  <input class="form-control" name="Sunshine" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Wind gust speed (km/h)">WindGustSpeed</label>
+                  <input class="form-control" name="WindGustSpeed" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Humidity at 9am (%)">Humidity9am</label>
+                  <input class="form-control" name="Humidity9am" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Humidity at 3pm (%)">Humidity3pm</label>
+                  <input class="form-control" name="Humidity3pm" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Pressure at 9am (hPa)">Pressure9am</label>
+                  <input class="form-control" name="Pressure9am" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Pressure at 3pm (hPa)">Pressure3pm</label>
+                  <input class="form-control" name="Pressure3pm" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Temperature at 9am (°C)">Temp9am</label>
+                  <input class="form-control" name="Temp9am" type="number" step="any" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" title="Temperature at 3pm (°C)">Temp3pm</label>
+                  <input class="form-control" name="Temp3pm" type="number" step="any" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Whether it rained today (Yes/No)">RainToday</label>
+                  <select class="form-select" name="RainToday" required>
+                    <option>No</option>
+                    <option>Yes</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" title="Weather station location">Location</label>
+                  <select class="form-select" name="Location" required>
+                    {% for loc in locations %}
+                      <option value="{{ loc }}">{{ loc }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-12 d-flex gap-2">
+                  <button class="btn btn-primary" type="submit">Predict</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card shadow-sm">
+            <div class="card-header bg-light">
+              <strong>Batch Prediction (CSV)</strong>
+            </div>
+            <div class="card-body">
+              <form method="post" action="{{ url_for('predict') }}" enctype="multipart/form-data" class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Model</label>
+                  <select class="form-select" name="model_choice">
+                    <option>Both</option>
+                    <option>Random Forest</option>
+                    <option>Logistic Regression</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <input class="form-control" type="file" name="file" accept=".csv" required>
+                  <div class="form-text">
+                    CSV must include columns: {{ REQUIRED_COLUMNS|default("MinTemp, MaxTemp, Rainfall, Evaporation, Sunshine, WindGustSpeed, Humidity9am, Humidity3pm, Pressure9am, Pressure3pm, Temp9am, Temp3pm, RainToday, Location") }}
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button class="btn btn-success" type="submit">Upload & Predict</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="card shadow-sm mt-4">
+            <div class="card-header bg-light">
+              <strong>Model Evaluation (20% holdout)</strong>
+            </div>
+            <div class="card-body small">
+              <table class="table table-sm">
+                <thead><tr><th>Model</th><th>Accuracy</th><th>F1</th><th>AUC</th></tr></thead>
+                <tbody>
+                  <tr><td>Logistic Regression</td><td>{{ '%.3f'|format(metrics_lr.accuracy) }}</td><td>{{ '%.3f'|format(metrics_lr.f1) }}</td><td>{{ '%.3f'|format(metrics_lr.auc) }}</td></tr>
+                  <tr><td>Random Forest</td><td>{{ '%.3f'|format(metrics_rf.accuracy) }}</td><td>{{ '%.3f'|format(metrics_rf.f1) }}</td><td>{{ '%.3f'|format(metrics_rf.auc) }}</td></tr>
+                </tbody>
+              </table>
+              <div class="text-muted">Better model: <strong>{{ better_model_name }}</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center py-3 text-muted">
+      Developed by Baarish | Dynamic Rainfall Prediction | Machine Learning Project 2025
+    </footer>
+  </body>
+</html>
